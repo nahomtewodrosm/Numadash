@@ -2,7 +2,7 @@
 
 import { Grid, PerspectiveCamera } from "@react-three/drei";
 import { Canvas, useFrame, useThree } from "@react-three/fiber";
-import { useEffect, useMemo, useRef } from "react";
+import { useEffect, useMemo, useRef, useSyncExternalStore } from "react";
 import * as THREE from "three";
 import { laneToX, type RunnerEngine } from "@/lib/game/engine";
 import {
@@ -57,20 +57,37 @@ const LIGHT_PALETTE: ScenePalette = {
   sun: "#ef6b1b",
 };
 
+const MOBILE_QUERY = "(max-width: 639px)";
+
+function subscribeMobile(callback: () => void) {
+  const mediaQuery = window.matchMedia(MOBILE_QUERY);
+  mediaQuery.addEventListener("change", callback);
+  return () => mediaQuery.removeEventListener("change", callback);
+}
+
+function getMobileSnapshot() {
+  return window.matchMedia(MOBILE_QUERY).matches;
+}
+
 export default function GameCanvas({
   engine,
   theme,
   onInvalidateReady,
 }: GameCanvasProps) {
   const dark = theme === "dark";
+  const mobile = useSyncExternalStore(
+    subscribeMobile,
+    getMobileSnapshot,
+    () => false,
+  );
   const palette = dark ? DARK_PALETTE : LIGHT_PALETTE;
 
   return (
     <Canvas
       frameloop="demand"
-      dpr={[1, 1.4]}
+      dpr={mobile ? 1 : [1, 1.4]}
       gl={{
-        antialias: true,
+        antialias: !mobile,
         alpha: false,
         powerPreference: "high-performance",
       }}
@@ -89,7 +106,7 @@ export default function GameCanvas({
       }
     >
       <InvalidateBridge onInvalidateReady={onInvalidateReady} />
-      <Scene engine={engine} palette={palette} dark={dark} />
+      <Scene engine={engine} palette={palette} dark={dark} mobile={mobile} />
     </Canvas>
   );
 }
@@ -111,10 +128,12 @@ function Scene({
   engine,
   palette,
   dark,
+  mobile,
 }: {
   engine: RunnerEngine;
   palette: ScenePalette;
   dark: boolean;
+  mobile: boolean;
 }) {
   return (
     <>
@@ -133,30 +152,34 @@ function Scene({
         intensity={dark ? 2.3 : 2.8}
         color={dark ? "#ffd3b5" : "#fff8ec"}
       />
-      <pointLight
-        position={[-7, 5, -6]}
-        color={palette.sun}
-        intensity={dark ? 24 : 12}
-        distance={28}
-        decay={2}
-      />
-      <directionalLight
-        position={[-8, 5, -12]}
-        color={palette.sun}
-        intensity={dark ? 0.7 : 0.35}
-      />
+      {!mobile && (
+        <>
+          <pointLight
+            position={[-7, 5, -6]}
+            color={palette.sun}
+            intensity={dark ? 24 : 12}
+            distance={28}
+            decay={2}
+          />
+          <directionalLight
+            position={[-8, 5, -12]}
+            color={palette.sun}
+            intensity={dark ? 0.7 : 0.35}
+          />
+        </>
+      )}
 
       <GameLoop engine={engine} />
       <Sun palette={palette} dark={dark} />
       <MountainRange palette={palette} />
       <Ground palette={palette} />
-      <SpeedMarkers engine={engine} palette={palette} />
-      <ObstacleField engine={engine} palette={palette} />
-      <ShardField engine={engine} />
+      <SpeedMarkers engine={engine} palette={palette} mobile={mobile} />
+      <ObstacleField engine={engine} palette={palette} mobile={mobile} />
+      <ShardField engine={engine} mobile={mobile} />
       <group name="player">
-        <DinoModel engine={engine} dark={dark} />
+        <DinoModel engine={engine} dark={dark} mobile={mobile} />
       </group>
-      <CameraRig engine={engine} />
+      <CameraRig engine={engine} mobile={mobile} />
     </>
   );
 }
@@ -293,9 +316,11 @@ function MountainRange({ palette }: { palette: ScenePalette }) {
 function SpeedMarkers({
   engine,
   palette,
+  mobile,
 }: {
   engine: RunnerEngine;
   palette: ScenePalette;
+  mobile: boolean;
 }) {
   const markers = useRef<Array<THREE.Group | null>>([]);
 
@@ -314,7 +339,7 @@ function SpeedMarkers({
 
   return (
     <group>
-      {Array.from({ length: 18 }, (_, index) => (
+      {Array.from({ length: mobile ? 10 : 18 }, (_, index) => (
         <group
           key={index}
           ref={(node) => {
@@ -345,9 +370,11 @@ function SpeedMarkers({
 function ObstacleField({
   engine,
   palette,
+  mobile,
 }: {
   engine: RunnerEngine;
   palette: ScenePalette;
+  mobile: boolean;
 }) {
   const cacti = useRef<Array<THREE.Group | null>>([]);
   const birds = useRef<Array<THREE.Group | null>>([]);
@@ -365,9 +392,9 @@ function ObstacleField({
           group.rotation.y =
             obstacle.variant === 0 ? 0.15 : obstacle.variant === 1 ? 0.8 : -0.45;
           group.scale.set(
-            0.88 + obstacle.variant * 0.05,
-            obstacle.height / 1.64,
-            0.88 + obstacle.variant * 0.05,
+            (0.88 + obstacle.variant * 0.05) * (mobile ? 0.84 : 1),
+            (obstacle.height / 1.64) * (mobile ? 0.84 : 1),
+            (0.88 + obstacle.variant * 0.05) * (mobile ? 0.84 : 1),
           );
         }
         cactusIndex += 1;
@@ -377,7 +404,7 @@ function ObstacleField({
           group.visible = true;
           group.position.set(laneToX(obstacle.lane), 2.16, obstacle.z);
           group.rotation.set(0, Math.PI, 0);
-          group.scale.setScalar(0.94);
+          group.scale.setScalar(mobile ? 0.82 : 0.94);
         }
         birdIndex += 1;
       }
@@ -419,7 +446,13 @@ function ObstacleField({
   );
 }
 
-function ShardField({ engine }: { engine: RunnerEngine }) {
+function ShardField({
+  engine,
+  mobile,
+}: {
+  engine: RunnerEngine;
+  mobile: boolean;
+}) {
   const shards = useRef<Array<THREE.Group | null>>([]);
 
   useFrame((state) => {
@@ -440,7 +473,10 @@ function ShardField({ engine }: { engine: RunnerEngine }) {
         shard.z,
       );
       group.rotation.y = state.clock.elapsedTime * 2.2 + shard.phase;
-      group.scale.setScalar(0.9 + Math.sin(state.clock.elapsedTime * 3 + shard.phase) * 0.08);
+      group.scale.setScalar(
+        (0.9 + Math.sin(state.clock.elapsedTime * 3 + shard.phase) * 0.08) *
+          (mobile ? 0.84 : 1),
+      );
     }
   });
 
@@ -461,7 +497,13 @@ function ShardField({ engine }: { engine: RunnerEngine }) {
   );
 }
 
-function CameraRig({ engine }: { engine: RunnerEngine }) {
+function CameraRig({
+  engine,
+  mobile,
+}: {
+  engine: RunnerEngine;
+  mobile: boolean;
+}) {
   const camera = useRef<THREE.PerspectiveCamera>(null);
   const shake = useRef(0);
   const wasOver = useRef(false);
@@ -480,25 +522,25 @@ function CameraRig({ engine }: { engine: RunnerEngine }) {
 
     camera.current.position.x = THREE.MathUtils.damp(
       camera.current.position.x,
-      6.8 + engine.lane * 0.14 + jitterX,
+      (mobile ? 0.8 : 6.8) + engine.lane * 0.14 + jitterX,
       3.5,
       delta,
     );
     camera.current.position.y = THREE.MathUtils.damp(
       camera.current.position.y,
-      4.7 + jitterY,
+      (mobile ? 5.2 : 4.7) + jitterY,
       3.5,
       delta,
     );
-    camera.current.lookAt(0, 1.38, -8.4);
+    camera.current.lookAt(0, mobile ? 1.5 : 1.38, -8.4);
   });
 
   return (
     <PerspectiveCamera
       ref={camera}
       makeDefault
-      position={[6.8, 4.7, 10.4]}
-      fov={43}
+      position={mobile ? [0.8, 5.2, 10.4] : [6.8, 4.7, 10.4]}
+      fov={mobile ? 68 : 43}
       near={0.1}
       far={180}
     />

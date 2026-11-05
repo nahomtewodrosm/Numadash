@@ -6,8 +6,8 @@ const HERO_STATS = [
 
 const BRIEF = [
   { label: "COURSE", value: "Endless" },
-  { label: "TOP SPEED", value: "137 km/h" },
-  { label: "BOARD", value: "Database" },
+  { label: "SPEED", value: "Depends on how you keep up" },
+  { label: "Funtime", value: "Guaranteed" },
 ];
 
 export function Hero() {
@@ -39,9 +39,7 @@ export function Hero() {
       <div className="container-page relative pt-16 pb-14 sm:pt-24 sm:pb-16 lg:pt-32 lg:pb-20">
         <div className="grid items-center gap-12 lg:grid-cols-[1.35fr_0.65fr] lg:gap-16">
           <div className="relative z-10 animate-rise-in">
-            <div className="eyebrow">
-              Browser-native / 3D / Endless
-            </div>
+            <div className="eyebrow">Browser-native / 3D / Endless</div>
 
             <h1 className="display-tight mt-7 text-[clamp(4rem,10vw,9.4rem)]">
               OUTRUN
@@ -51,8 +49,8 @@ export function Hero() {
 
             <p className="mt-7 max-w-xl text-[15px] leading-7 text-muted sm:text-base sm:leading-8">
               A three-lane, real-time 3D endless runner. Jump cacti, duck
-              pterodactyls and chase the global board. No downloads, no
-              account — just WebGL and a keyboard.
+              pterodactyls and chase the global board. No downloads, no account
+              — just WebGL and a keyboard.
             </p>
 
             <div className="mt-8 flex flex-wrap items-center gap-x-6 gap-y-3 text-[11px] text-muted">
@@ -69,11 +67,11 @@ export function Hero() {
                 <div className="absolute inset-12 rounded-full border border-accent/30" />
                 <div className="absolute inset-0 grid place-items-center">
                   <div className="text-center">
+                    <p className="font-mono text-7xl font-semibold leading-none tracking-[-0.08em]">
+                      3
+                    </p>
                     <p className="font-mono text-[9px] tracking-[0.22em] text-muted">
                       LANES
-                    </p>
-                    <p className="font-mono text-7xl font-semibold leading-none tracking-[-0.08em]">
-                      03
                     </p>
                     <p className="mt-2 font-mono text-[9px] tracking-[0.16em] text-accent">
                       ONE SURVIVOR
@@ -97,11 +95,6 @@ export function Hero() {
                   </div>
                 ))}
               </div>
-
-              <p className="mt-5 flex items-center gap-2 font-mono text-[9px] tracking-[0.16em] text-muted">
-                <span className="h-px w-6 bg-accent" />
-                THE COURSE STARTS BELOW
-              </p>
             </div>
           </aside>
         </div>

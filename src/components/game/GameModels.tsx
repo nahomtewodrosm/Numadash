@@ -11,9 +11,10 @@ const INK = "#080807";
 interface DinoModelProps {
   engine: RunnerEngine;
   dark: boolean;
+  mobile: boolean;
 }
 
-export function DinoModel({ engine, dark }: DinoModelProps) {
+export function DinoModel({ engine, dark, mobile }: DinoModelProps) {
   const actor = useRef<THREE.Group>(null);
   const body = useRef<THREE.Group>(null);
   const tail = useRef<THREE.Group>(null);
@@ -34,6 +35,7 @@ export function DinoModel({ engine, dark }: DinoModelProps) {
     const stride = running ? Math.sin(phase.current) : 0;
     const airborne = engine.jumpY > 0.02;
     const targetScale = engine.ducking ? 0.58 : 1;
+    const sizeScale = mobile ? 0.84 : 1;
     const targetTilt = engine.status === "over" ? -0.36 : 0;
 
     actor.current.position.x = THREE.MathUtils.damp(
@@ -43,12 +45,14 @@ export function DinoModel({ engine, dark }: DinoModelProps) {
       delta,
     );
     actor.current.position.y = engine.jumpY;
+    actor.current.scale.x = sizeScale;
     actor.current.scale.y = THREE.MathUtils.damp(
       actor.current.scale.y,
-      targetScale,
+      targetScale * sizeScale,
       13,
       delta,
     );
+    actor.current.scale.z = sizeScale;
     actor.current.rotation.z = THREE.MathUtils.damp(
       actor.current.rotation.z,
       targetTilt,

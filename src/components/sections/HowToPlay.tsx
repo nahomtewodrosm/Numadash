@@ -33,13 +33,14 @@ const MOVES: Move[] = [
 
 export function HowToPlay() {
   return (
-    <section id="how-to" className="border-t border-line bg-paper py-20 sm:py-28">
+    <section
+      id="how-to"
+      className="border-t border-line bg-paper py-20 sm:py-28"
+    >
       <div className="container-page">
         <div className="grid gap-8 lg:grid-cols-[0.95fr_1.05fr] lg:items-end">
           <div>
-            <p className="eyebrow">
-              Controls / flow state
-            </p>
+            <p className="eyebrow">Controls / flow state</p>
             <h2 className="display-tight mt-4 text-[clamp(2.8rem,6vw,5.5rem)]">
               THREE MOVES.
               <br />
@@ -60,9 +61,7 @@ export function HowToPlay() {
               <article
                 key={move.number}
                 className={`how-to-card animate-rise-in group relative flex flex-col overflow-hidden rounded-[26px] border border-line bg-surface p-5 transition-colors hover:border-accent/50 sm:p-6 ${
-                  featured
-                    ? "md:col-span-7 md:row-span-2"
-                    : "md:col-span-5"
+                  featured ? "md:col-span-7 md:row-span-2" : "md:col-span-5"
                 }`}
               >
                 <span
@@ -131,8 +130,7 @@ export function HowToPlay() {
             </p>
             <p className="mt-4 font-mono text-lg font-semibold leading-7 tracking-[-0.03em]">
               DISTANCE × 1.6
-              <br />
-              + SHARDS × 50
+              <br />+ SHARDS × 50
             </p>
             <p className="mt-auto pt-5 text-[11px] leading-5 text-accent-ink/70">
               Every saved run is validated, ranked and written to the global
@@ -145,7 +143,7 @@ export function HowToPlay() {
               LIVE PACE
             </p>
             <p className="mt-4 font-mono text-3xl font-semibold tracking-[-0.06em]">
-              0 → 137
+              0 → 50
               <span className="ml-1 font-sans text-[10px] font-medium tracking-normal text-muted">
                 km/h
               </span>
@@ -203,6 +201,7 @@ function MoveDiagram({ move }: { move: string }) {
               strokeLinejoin="round"
             />
           </svg>
+
           <svg
             aria-hidden="true"
             viewBox="0 0 64 40"
@@ -244,7 +243,11 @@ function MoveDiagram({ move }: { move: string }) {
           strokeWidth="2"
           strokeLinejoin="round"
         />
-        <path d="M24 58v-4M110 24v-4M196 58v-4" stroke="var(--accent)" strokeWidth="2" />
+        <path
+          d="M24 58v-4M110 24v-4M196 58v-4"
+          stroke="var(--accent)"
+          strokeWidth="2"
+        />
       </svg>
     );
   }
@@ -256,15 +259,14 @@ function MoveDiagram({ move }: { move: string }) {
       fill="none"
       aria-label="Duck beneath a flying obstacle"
     >
-      <path d="M8 22h204" stroke="var(--accent)" strokeWidth="1.5" strokeDasharray="4 5" />
       <path
-        d="M92 25 110 16l18 9-10-2-8 7-8-7-10 2Z"
-        fill="var(--ink-soft)"
+        d="M8 22h204"
+        stroke="var(--accent)"
+        strokeWidth="1.5"
+        strokeDasharray="4 5"
       />
-      <path
-        d="M72 57h18v-8h15v-9h20v12h17v7H72Z"
-        fill="var(--ink-soft)"
-      />
+      <path d="M92 25 110 16l18 9-10-2-8 7-8-7-10 2Z" fill="var(--ink-soft)" />
+      <path d="M72 57h18v-8h15v-9h20v12h17v7H72Z" fill="var(--ink-soft)" />
       <path d="M8 62h204" stroke="var(--line-strong)" strokeWidth="1" />
     </svg>
   );
