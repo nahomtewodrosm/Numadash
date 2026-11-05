@@ -97,6 +97,7 @@ function playEventSound(event: GameEvent): void {
 export function Game() {
   const shellRef = useRef<HTMLDivElement>(null);
   const touchStart = useRef<{ x: number; y: number } | null>(null);
+  const duckTimer = useRef<number | null>(null);
   const inView = useRef(false);
   const invalidateCanvas = useRef<() => void>(() => {});
   const startedOnce = useRef(false);
@@ -128,7 +129,8 @@ export function Game() {
     try {
       await shellRef.current.requestFullscreen();
     } catch {
-      // Fullscreen is optional; the game remains playable when unavailable.
+      setIsFullscreen(true);
+      inView.current = true;
     }
   }, []);
 
@@ -183,6 +185,11 @@ export function Game() {
   }, [engine]);
 
   const toggleFullscreen = useCallback(async () => {
+    if (isFullscreen && !document.fullscreenElement) {
+      setIsFullscreen(false);
+      return;
+    }
+
     try {
       if (document.fullscreenElement) {
         await document.exitFullscreen();
@@ -192,7 +199,7 @@ export function Game() {
     } catch {
       // Fullscreen can be blocked by browser policy; the game still works.
     }
-  }, [enterFullscreen]);
+  }, [enterFullscreen, isFullscreen]);
 
   const showDashboard = useCallback(async () => {
     if (document.fullscreenElement) {
@@ -202,6 +209,8 @@ export function Game() {
         showToast("Could not exit fullscreen. Use your device's fullscreen control.", "error");
         return;
       }
+    } else if (isFullscreen) {
+      setIsFullscreen(false);
     }
 
     window.requestAnimationFrame(() => {
@@ -209,7 +218,7 @@ export function Game() {
         behavior: "smooth",
       });
     });
-  }, []);
+  }, [isFullscreen]);
 
   const handleTouchStart = useCallback((event: TouchEvent<HTMLDivElement>) => {
     const target = event.target as HTMLElement;
@@ -234,6 +243,17 @@ export function Game() {
       if (Math.max(Math.abs(deltaX), Math.abs(deltaY)) < 36) return;
       if (Math.abs(deltaX) > Math.abs(deltaY)) {
         engine.moveLane(deltaX < 0 ? -1 : 1);
+      } else if (deltaY > 0) {
+        engine.setDucking(true);
+        if (duckTimer.current !== null) {
+          window.clearTimeout(duckTimer.current);
+        }
+        duckTimer.current = window.setTimeout(() => {
+          engine.setDucking(false);
+          duckTimer.current = null;
+        }, 600);
+      } else {
+        engine.jump();
       }
     },
     [engine],
@@ -347,6 +367,13 @@ export function Game() {
       document.removeEventListener("fullscreenchange", handleFullscreenChange);
   }, [engine]);
 
+  useEffect(
+    () => () => {
+      if (duckTimer.current !== null) window.clearTimeout(duckTimer.current);
+    },
+    [],
+  );
+
   useEffect(() => {
     if (status !== "running") return;
 
@@ -376,6 +403,7 @@ export function Game() {
     const observer = new IntersectionObserver(
       ([entry]) => {
         const visible =
+          isFullscreen ||
           document.fullscreenElement === node ||
           (entry.isIntersecting && entry.intersectionRatio >= 0.2);
         inView.current = visible;
@@ -390,7 +418,7 @@ export function Game() {
 
     observer.observe(node);
     return () => observer.disconnect();
-  }, [engine]);
+  }, [engine, isFullscreen]);
 
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
@@ -449,6 +477,8 @@ export function Game() {
         case "Escape":
           if (document.fullscreenElement) {
             void document.exitFullscreen();
+          } else if (isFullscreen) {
+            setIsFullscreen(false);
           } else {
             togglePause();
           }
@@ -476,7 +506,7 @@ export function Game() {
       window.removeEventListener("keydown", handleKeyDown);
       window.removeEventListener("keyup", handleKeyUp);
     };
-  }, [engine, resumeGame, startGame, togglePause]);
+  }, [engine, isFullscreen, resumeGame, startGame, togglePause]);
 
   return (
     <div className="relative">
@@ -490,7 +520,7 @@ export function Game() {
         className={clsx(
           "relative isolate overflow-hidden border border-line bg-[#080807] shadow-panel outline-none",
           isFullscreen
-            ? "h-screen w-screen rounded-none border-0"
+            ? "fixed inset-0 z-[60] h-dvh w-screen rounded-none border-0"
             : "h-[540px] rounded-[28px] sm:h-[590px] lg:h-[630px]",
           status === "running"
             ? "cursor-none touch-none [&_*]:cursor-none"
@@ -530,15 +560,6 @@ export function Game() {
           onToggleSound={toggleSound}
           onTogglePause={togglePause}
           onFullscreen={toggleFullscreen}
-          onMobileJump={() => {
-            if (engine.status === "running") {
-              engine.jump();
-            } else if (engine.status === "idle" || engine.status === "over") {
-              startGame();
-            }
-          }}
-          onMobileDuckStart={() => engine.setDucking(true)}
-          onMobileDuckEnd={() => engine.setDucking(false)}
         />
 
         <GameOverlay

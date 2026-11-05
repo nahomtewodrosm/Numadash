@@ -13,9 +13,6 @@ interface GameHudProps {
   onToggleSound: () => void;
   onTogglePause: () => void;
   onFullscreen: () => void;
-  onMobileJump: () => void;
-  onMobileDuckStart: () => void;
-  onMobileDuckEnd: () => void;
 }
 
 const STATUS_COPY: Record<GameStatus, string> = {
@@ -34,9 +31,6 @@ export function GameHud({
   onToggleSound,
   onTogglePause,
   onFullscreen,
-  onMobileJump,
-  onMobileDuckStart,
-  onMobileDuckEnd,
 }: GameHudProps) {
   return (
     <div className="pointer-events-none absolute inset-0 z-20 flex flex-col justify-between p-3.5 sm:p-5">
@@ -56,27 +50,62 @@ export function GameHud({
             onClick={onToggleSound}
             aria-label={soundOn ? "Mute game audio" : "Enable game audio"}
             title={soundOn ? "Mute audio" : "Enable audio"}
-            className="rounded-full border border-line/70 bg-surface/82 px-2.5 py-2 font-mono text-[8px] tracking-[0.08em] text-ink-soft backdrop-blur-md transition-colors hover:border-accent hover:text-accent sm:px-3"
+            className="rounded-full border border-line/70 bg-surface/82 px-2 py-2 font-mono text-[8px] tracking-[0.08em] text-ink-soft backdrop-blur-md transition-colors hover:border-accent hover:text-accent sm:px-3"
           >
-            {soundOn ? "SOUND ON" : "SOUND OFF"}
+            <span className="sm:hidden">{soundOn ? "SND ON" : "SND OFF"}</span>
+            <span className="hidden sm:inline">
+              {soundOn ? "SOUND ON" : "SOUND OFF"}
+            </span>
           </button>
           <button
             type="button"
             onClick={onTogglePause}
             aria-label={status === "paused" ? "Resume game" : "Pause game"}
             title={status === "paused" ? "Resume" : "Pause"}
-            className="rounded-full border border-line/70 bg-surface/82 px-2.5 py-2 font-mono text-[8px] tracking-[0.08em] text-ink-soft backdrop-blur-md transition-colors hover:border-accent hover:text-accent sm:px-3"
+            className="rounded-full border border-line/70 bg-surface/82 px-2 py-2 font-mono text-[8px] tracking-[0.08em] text-ink-soft backdrop-blur-md transition-colors hover:border-accent hover:text-accent sm:px-3"
           >
-            {status === "paused" ? "RESUME" : "PAUSE"}
+            <span className="sm:hidden">{status === "paused" ? "PLAY" : "PAUSE"}</span>
+            <span className="hidden sm:inline">
+              {status === "paused" ? "RESUME" : "PAUSE"}
+            </span>
           </button>
           <button
             type="button"
             onClick={onFullscreen}
             aria-label={isFullscreen ? "Exit fullscreen" : "Enter fullscreen"}
             title={isFullscreen ? "Exit fullscreen" : "Fullscreen"}
-            className="rounded-full border border-line/70 bg-surface/82 px-2.5 py-2 font-mono text-[8px] tracking-[0.08em] text-ink-soft backdrop-blur-md transition-colors hover:border-accent hover:text-accent sm:px-3"
+            className="grid size-9 place-items-center rounded-full border border-line/70 bg-surface/82 text-ink-soft backdrop-blur-md transition-colors hover:border-accent hover:text-accent sm:h-auto sm:w-auto sm:px-3 sm:py-2"
           >
-            {isFullscreen ? "EXIT FULLSCREEN" : "FULLSCREEN"}
+            <svg
+              aria-hidden="true"
+              viewBox="0 0 20 20"
+              fill="none"
+              className="size-4"
+            >
+              {isFullscreen ? (
+                <path
+                  d="M7 3v4H3m14 0h-4V3M3 13h4v4m10-4h-4v4"
+                  stroke="currentColor"
+                  strokeWidth="1.7"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+              ) : (
+                <path
+                  d="M3 7V3h4m6 0h4v4M17 13v4h-4m-6 0H3v-4"
+                  stroke="currentColor"
+                  strokeWidth="1.7"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+              )}
+            </svg>
+            <span className="sr-only">
+              {isFullscreen ? "Exit fullscreen" : "Enter fullscreen"}
+            </span>
+            <span className="ml-1 hidden font-mono text-[8px] tracking-[0.08em] sm:inline">
+              {isFullscreen ? "EXIT FULLSCREEN" : "FULLSCREEN"}
+            </span>
           </button>
         </div>
       </div>
@@ -147,28 +176,10 @@ export function GameHud({
         </div>
       </div>
 
-      <div className="pointer-events-auto mt-3 grid grid-cols-2 gap-2 sm:hidden">
-        <button
-          type="button"
-          aria-label="Duck"
-          onPointerDown={onMobileDuckStart}
-          onPointerUp={onMobileDuckEnd}
-          onPointerLeave={onMobileDuckEnd}
-          onPointerCancel={onMobileDuckEnd}
-          className="h-11 rounded-xl border border-line/70 bg-surface/80 font-mono text-[10px] tracking-[0.1em] text-ink-soft backdrop-blur-md active:bg-accent active:text-accent-ink"
-        >
-          DUCK
-        </button>
-        <button
-          type="button"
-          aria-label="Jump"
-          onClick={onMobileJump}
-          className="h-11 rounded-xl bg-accent font-mono text-[10px] font-semibold tracking-[0.1em] text-accent-ink shadow-lg active:brightness-90"
-        >
-          JUMP
-        </button>
-        <p className="col-span-2 text-center font-mono text-[8px] tracking-[0.12em] text-muted">
-          SWIPE LEFT / RIGHT TO CHANGE LANES
+      <div className="pointer-events-none mt-3 sm:hidden">
+        <p className="text-center font-mono text-[8px] leading-5 tracking-[0.1em] text-muted">
+          SWIPE ← / → LANES <span className="text-accent">·</span> ↑ JUMP{" "}
+          <span className="text-accent">·</span> ↓ DUCK
         </p>
       </div>
     </div>
