@@ -1,0 +1,153 @@
+diff --git a/node_modules/@react-three/fiber/dist/events-0dab3c53.cjs.dev.js b/node_modules/@react-three/fiber/dist/events-0dab3c53.cjs.dev.js
+index 705fbd5..fa5d16a 100644
+--- a/node_modules/@react-three/fiber/dist/events-0dab3c53.cjs.dev.js
++++ b/node_modules/@react-three/fiber/dist/events-0dab3c53.cjs.dev.js
+@@ -32,6 +32,37 @@ var React__namespace = /*#__PURE__*/_interopNamespace(React);
+ var THREE__namespace = /*#__PURE__*/_interopNamespace(THREE);
+ var w1__default = /*#__PURE__*/_interopDefault(w1);
+ 
++class FiberTimer extends THREE.Timer {
++  constructor() {
++    super();
++    this.autoStart = true;
++    this.running = false;
++    this.elapsedTime = 0;
++    this.oldTime = 0;
++  }
++  start() {
++    this.reset();
++    this._elapsed = 0;
++    this.elapsedTime = 0;
++    this.running = true;
++  }
++  stop() {
++    this.running = false;
++  }
++  getDelta() {
++    if (this.autoStart && !this.running) {
++      this.start();
++      return 0;
++    }
++    if (!this.running) return 0;
++    this.update();
++    const delta = super.getDelta();
++    this.elapsedTime = super.getElapsed();
++    this.oldTime = this.elapsedTime * 1000;
++    return delta;
++  }
++}
++
+ var threeTypes = /*#__PURE__*/Object.freeze({
+   __proto__: null
+ });
+@@ -1229,7 +1260,7 @@ const createStore = (invalidate, advance) => {
+       linear: false,
+       flat: false,
+       controls: null,
+-      clock: new THREE__namespace.Clock(),
++      clock: new FiberTimer(),
+       pointer,
+       mouse: pointer,
+       frameloop: 'always',
+diff --git a/node_modules/@react-three/fiber/dist/events-98e95d43.cjs.prod.js b/node_modules/@react-three/fiber/dist/events-98e95d43.cjs.prod.js
+index c265e9e..c00d9d6 100644
+--- a/node_modules/@react-three/fiber/dist/events-98e95d43.cjs.prod.js
++++ b/node_modules/@react-three/fiber/dist/events-98e95d43.cjs.prod.js
+@@ -32,6 +32,37 @@ var React__namespace = /*#__PURE__*/_interopNamespace(React);
+ var THREE__namespace = /*#__PURE__*/_interopNamespace(THREE);
+ var w1__default = /*#__PURE__*/_interopDefault(w1);
+ 
++class FiberTimer extends THREE.Timer {
++  constructor() {
++    super();
++    this.autoStart = true;
++    this.running = false;
++    this.elapsedTime = 0;
++    this.oldTime = 0;
++  }
++  start() {
++    this.reset();
++    this._elapsed = 0;
++    this.elapsedTime = 0;
++    this.running = true;
++  }
++  stop() {
++    this.running = false;
++  }
++  getDelta() {
++    if (this.autoStart && !this.running) {
++      this.start();
++      return 0;
++    }
++    if (!this.running) return 0;
++    this.update();
++    const delta = super.getDelta();
++    this.elapsedTime = super.getElapsed();
++    this.oldTime = this.elapsedTime * 1000;
++    return delta;
++  }
++}
++
+ var threeTypes = /*#__PURE__*/Object.freeze({
+   __proto__: null
+ });
+@@ -1229,7 +1260,7 @@ const createStore = (invalidate, advance) => {
+       linear: false,
+       flat: false,
+       controls: null,
+-      clock: new THREE__namespace.Clock(),
++      clock: new FiberTimer(),
+       pointer,
+       mouse: pointer,
+       frameloop: 'always',
+diff --git a/node_modules/@react-three/fiber/dist/events-e51d7528.esm.js b/node_modules/@react-three/fiber/dist/events-e51d7528.esm.js
+index 6c801a2..2d5c0b6 100644
+--- a/node_modules/@react-three/fiber/dist/events-e51d7528.esm.js
++++ b/node_modules/@react-three/fiber/dist/events-e51d7528.esm.js
+@@ -7,6 +7,37 @@ import { suspend, preload, clear } from 'suspend-react';
+ import { useFiber, useContextBridge, traverseFiber, useActivityBridge as useActivityBridge$1 } from 'its-fine';
+ import w1, { unstable_getCurrentPriorityLevel, unstable_IdlePriority, unstable_LowPriority, unstable_NormalPriority, unstable_UserBlockingPriority, unstable_ImmediatePriority, unstable_scheduleCallback } from 'scheduler';
+ 
++class FiberTimer extends THREE.Timer {
++  constructor() {
++    super();
++    this.autoStart = true;
++    this.running = false;
++    this.elapsedTime = 0;
++    this.oldTime = 0;
++  }
++  start() {
++    this.reset();
++    this._elapsed = 0;
++    this.elapsedTime = 0;
++    this.running = true;
++  }
++  stop() {
++    this.running = false;
++  }
++  getDelta() {
++    if (this.autoStart && !this.running) {
++      this.start();
++      return 0;
++    }
++    if (!this.running) return 0;
++    this.update();
++    const delta = super.getDelta();
++    this.elapsedTime = super.getElapsed();
++    this.oldTime = this.elapsedTime * 1000;
++    return delta;
++  }
++}
++
+ var threeTypes = /*#__PURE__*/Object.freeze({
+   __proto__: null
+ });
+@@ -1204,7 +1235,7 @@ const createStore = (invalidate, advance) => {
+       linear: false,
+       flat: false,
+       controls: null,
+-      clock: new THREE.Clock(),
++      clock: new FiberTimer(),
+       pointer,
+       mouse: pointer,
+       frameloop: 'always',
