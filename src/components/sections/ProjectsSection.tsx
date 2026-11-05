@@ -61,10 +61,6 @@ export function ProjectsSection() {
               <span className="text-accent">THE CREATOR.</span>
             </h2>
           </div>
-          <p className="max-w-md text-sm leading-6 text-muted lg:justify-self-end">
-            A few other things made with the same curiosity for thoughtful
-            design and playful technology.
-          </p>
         </div>
 
         <div className="mt-10 grid gap-4 md:grid-cols-3">
@@ -154,6 +150,8 @@ export function ProjectsSection() {
                     {selectedProject.href ? (
                       <a
                         href={selectedProject.href}
+                        target="_blank"
+                        rel="noopener noreferrer"
                         onClick={() => dialogRef.current?.close()}
                         className="primary-button w-full"
                       >

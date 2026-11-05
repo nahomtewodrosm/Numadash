@@ -106,8 +106,8 @@ export function StackSection() {
           })}
         </div>
 
-        <div className="mt-10 grid gap-5 lg:grid-cols-[1.1fr_0.9fr]">
-          <div className="grid gap-3 sm:grid-cols-2">
+        <div className="mt-10">
+          <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
             {STACK.map((item, index) => {
               return (
                 <div
@@ -126,47 +126,6 @@ export function StackSection() {
                 </div>
               );
             })}
-          </div>
-
-          <div className="overflow-hidden rounded-2xl border border-line bg-surface-raised">
-            <div className="flex items-center justify-between border-b border-line px-4 py-3">
-              <span className="font-mono text-[8px] tracking-[0.14em] text-muted">
-                SCORE SERVICE
-              </span>
-            </div>
-            <div className="p-5 font-mono text-[10px] leading-6 sm:text-[11px]">
-              <p className="text-muted">{"// validate untrusted input"}</p>
-              <p>
-                <span className="text-accent">const</span>{" "}
-                <span className="text-ink-soft">parsed</span> ={" "}
-                <span className="text-accent">schema</span>.safeParse(body);
-              </p>
-              <p className="text-muted">
-                {"// reject bad callsigns + impossible scores"}
-              </p>
-              <p>
-                <span className="text-accent">if</span> (!parsed.success)
-                <span className="text-muted"> return </span>
-                <span className="text-accent-strong">422</span>;
-              </p>
-              <p className="mt-2 text-muted">
-                {"// cached Mongo connection"}
-              </p>
-              <p>
-                <span className="text-accent">const</span>{" "}
-                <span className="text-ink-soft">result</span> ={" "}
-                <span className="text-accent">await</span> saveScore(
-                <span className="text-ink-soft">parsed.data</span>);
-              </p>
-              <p>
-                <span className="text-accent">return</span> Response.json(
-                <span className="text-ink-soft">result</span>, {"{"} status:{" "}
-                <span className="text-accent-strong">201</span> {"}"});
-              </p>
-              <div className="mt-4 flex items-center gap-2 border-t border-line pt-4 text-[9px] text-muted">
-                RATE LIMITED · TYPE SAFE · FAILS GRACEFULLY
-              </div>
-            </div>
           </div>
         </div>
 

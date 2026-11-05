@@ -171,7 +171,7 @@ function MoveDiagram({ move }: { move: string }) {
   if (move === "Strafe") {
     return (
       <div
-        className="mt-8 grid flex-1 grid-cols-3 gap-2"
+        className="relative mt-8 grid flex-1 grid-cols-3 gap-2"
         aria-label="Three lanes; move left or right to switch lanes"
       >
         {["LEFT", "MID", "RIGHT"].map((lane, index) => (
@@ -183,16 +183,41 @@ function MoveDiagram({ move }: { move: string }) {
                 : "border-line bg-paper-deep"
             }`}
           >
-            <span
-              className={`absolute top-3 left-1/2 h-px w-7 -translate-x-1/2 ${
-                index === 1 ? "bg-accent" : "bg-line-strong"
-              }`}
-            />
             <span className="absolute bottom-2.5 left-1/2 -translate-x-1/2 font-mono text-[7px] tracking-[0.14em] text-muted">
               {lane}
             </span>
           </div>
         ))}
+        <div className="pointer-events-none absolute inset-x-0 top-1/2 flex -translate-y-1/2 items-center justify-between px-3 text-accent">
+          <svg
+            aria-hidden="true"
+            viewBox="0 0 64 40"
+            className="h-10 w-16 drop-shadow-sm"
+          >
+            <path
+              d="M58 20H8m0 0 15-15M8 20l15 15"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="5"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            />
+          </svg>
+          <svg
+            aria-hidden="true"
+            viewBox="0 0 64 40"
+            className="h-10 w-16 drop-shadow-sm"
+          >
+            <path
+              d="M6 20h50m0 0L41 5m15 15L41 35"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="5"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            />
+          </svg>
+        </div>
         <span className="sr-only">Use A and D or arrow keys.</span>
       </div>
     );
